@@ -3,11 +3,23 @@
   "version": "0.1.0",
   "type": "module",
   "main": "src/index.ts",
+  "files": ["src"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "npm publish"
+  },
   "dependencies": {
     "@opencode-ai/plugin": "latest",
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.30.0",
     "@types/js-yaml": "^4.0.9",
     "bun-types": "latest",
     "typescript": "^5.7.0"
