@@ -1,9 +1,26 @@
 // ── Source types (Claude Code plugin format) ──
 
-export interface InstalledPluginsFile {
-  version: number;
+/** V1: each plugin key maps to a single entry (no scope, no array) */
+export interface InstalledPluginsFileV1 {
+  version: 1;
+  plugins: Record<string, PluginInstallationV1>;
+}
+
+export interface PluginInstallationV1 {
+  version: string;
+  installedAt: string;
+  lastUpdated?: string;
+  installPath: string;
+  gitCommitSha?: string;
+}
+
+/** V2: each plugin key maps to an array of scoped entries */
+export interface InstalledPluginsFileV2 {
+  version: 2;
   plugins: Record<string, PluginInstallation[]>;
 }
+
+export type InstalledPluginsFile = InstalledPluginsFileV1 | InstalledPluginsFileV2;
 
 export interface PluginInstallation {
   scope: "user" | "project" | "local";
@@ -11,7 +28,7 @@ export interface PluginInstallation {
   projectPath?: string;
   version: string;
   installedAt: string;
-  lastUpdated: string;
+  lastUpdated?: string;
   gitCommitSha?: string;
 }
 
