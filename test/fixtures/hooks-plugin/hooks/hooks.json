@@ -1,0 +1,49 @@
+{
+  "PreToolUse": [
+    {
+      "matcher": "Write",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/../scripts/modify-args.sh",
+          "timeout": 5
+        }
+      ]
+    },
+    {
+      "matcher": "*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/../scripts/echo-stdin.sh"
+        }
+      ]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/../scripts/add-context.sh",
+          "timeout": 3
+        }
+      ]
+    }
+  ],
+  "PermissionRequest": [
+    {
+      "matcher": "bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/../scripts/approve.sh"
+        },
+        {
+          "type": "prompt",
+          "command": "ignored-prompt-hook"
+        }
+      ]
+    }
+  ]
+}

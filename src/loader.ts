@@ -14,6 +14,7 @@ import type {
   ParsedCommand,
   ParsedMcp,
 } from "./types.js";
+import { loadHooks } from "./hooks/bridge-loader.js";
 
 async function readFileSafe(path: string): Promise<string | null> {
   try {
@@ -57,13 +58,15 @@ export async function loadPlugin(
 
   const pluginName = manifest.name;
 
-  const [claudeMd, skills, agents, commands, mcpServers] = await Promise.all([
-    readFileSafe(join(installPath, "CLAUDE.md")),
-    loadSkills(installPath, pluginName),
-    loadAgents(installPath, pluginName),
-    loadCommands(installPath, pluginName),
-    loadMcpServers(installPath, pluginName),
-  ]);
+  const [claudeMd, skills, agents, commands, mcpServers, hookEntries] =
+    await Promise.all([
+      readFileSafe(join(installPath, "CLAUDE.md")),
+      loadSkills(installPath, pluginName),
+      loadAgents(installPath, pluginName),
+      loadCommands(installPath, pluginName),
+      loadMcpServers(installPath, pluginName),
+      loadHooks(installPath, pluginName),
+    ]);
 
   return {
     name: pluginName,
@@ -73,6 +76,7 @@ export async function loadPlugin(
     agents,
     commands,
     mcpServers,
+    hookEntries,
   };
 }
 
@@ -219,11 +223,15 @@ async function loadMcpServers(
 
   const servers: ParsedMcp[] = [];
   for (const [serverName, server] of Object.entries(config.mcpServers)) {
-    // Expand env variables
+    // Expand env variables — omit unresolved vars so the MCP server
+    // can inherit them from the parent process environment
     const env: Record<string, string> = {};
     if (server.env) {
       for (const [k, v] of Object.entries(server.env)) {
-        env[k] = expandEnv(v);
+        const expanded = expandEnv(v);
+        if (expanded !== null) {
+          env[k] = expanded;
+        }
       }
     }
 
@@ -240,15 +248,27 @@ async function loadMcpServers(
   return servers;
 }
 
-function expandEnv(value: string): string {
-  return value.replace(/\$\{([^}]+)\}/g, (_match, varName) => {
+function expandEnv(value: string): string | null {
+  let hasUnresolved = false;
+  const result = value.replace(/\$\{([^}]+)\}/g, (_match, varExpr) => {
+    // Support ${VAR:-default} syntax
+    const colonIdx = varExpr.indexOf(":-");
+    const varName = colonIdx >= 0 ? varExpr.slice(0, colonIdx) : varExpr;
+    const fallback = colonIdx >= 0 ? varExpr.slice(colonIdx + 2) : undefined;
+
     const val = process.env[varName];
-    if (val === undefined) {
-      console.warn(
-        `[cc-plugin-loader] Environment variable ${varName} is not set`,
-      );
-      return "";
-    }
-    return val;
+    if (val !== undefined) return val;
+    if (fallback !== undefined) return fallback;
+
+    console.warn(
+      `[cc-plugin-loader] Environment variable ${varName} not set, omitting from MCP config`,
+    );
+    hasUnresolved = true;
+    return "";
   });
+
+  // If the entire value was a single unresolved ${VAR}, omit it
+  // so the MCP server can inherit from parent environment
+  if (hasUnresolved && result === "") return null;
+  return result;
 }

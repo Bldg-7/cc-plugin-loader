@@ -1,3 +1,5 @@
+import type { ResolvedHookEntry } from "./hooks/bridge-types.js";
+
 // ── Source types (Claude Code plugin format) ──
 
 /** V1: each plugin key maps to a single entry (no scope, no array) */
@@ -121,4 +123,7 @@ export interface ParsedPlugin {
   agents: ParsedAgent[];
   commands: ParsedCommand[];
   mcpServers: ParsedMcp[];
+  hookEntries: ResolvedHookEntry[];
 }
+
+export type { ResolvedHookEntry };

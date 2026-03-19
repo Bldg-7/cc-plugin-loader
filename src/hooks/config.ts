@@ -31,8 +31,9 @@ export function createConfigHook(plugins: ParsedPlugin[]) {
         };
       }
 
-      // Register MCP servers
+      // Register MCP servers (skip if already configured natively)
       for (const mcp of plugin.mcpServers) {
+        if (config.mcp[mcp.qualifiedName]) continue;
         config.mcp[mcp.qualifiedName] = {
           type: "local" as const,
           command: [mcp.command, ...mcp.args],

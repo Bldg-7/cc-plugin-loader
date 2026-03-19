@@ -5,6 +5,7 @@ import { createConfigHook } from "./hooks/config.js";
 import { createSystemHook } from "./hooks/system.js";
 import { createCommandHook } from "./hooks/command.js";
 import { createEnvHook } from "./hooks/env.js";
+import { createBridgeHooks } from "./hooks/bridge.js";
 import type { ParsedPlugin } from "./types.js";
 
 const plugin: Plugin = async (input) => {
@@ -37,6 +38,7 @@ const plugin: Plugin = async (input) => {
     "experimental.chat.system.transform": createSystemHook(plugins),
     "command.execute.before": createCommandHook(plugins),
     "shell.env": createEnvHook(plugins),
+    ...createBridgeHooks(plugins),
   };
 };
 
