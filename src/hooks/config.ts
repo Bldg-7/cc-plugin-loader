@@ -50,7 +50,7 @@ export function createConfigHook(plugins: ParsedPlugin[]) {
         const model = agent.model ? mapModel(agent.model) : undefined;
         config.agent[key] = {
           description: agent.description,
-          mode: "subagent",
+          mode: "all",
           prompt: agent.prompt,
           tools: mapTools(agent.tools),
           ...(model && { model }),
