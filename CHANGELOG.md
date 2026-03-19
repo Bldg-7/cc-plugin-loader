@@ -1,5 +1,11 @@
 # @bldg-7/cc-plugin-loader
 
+## 0.2.1
+
+### Patch Changes
+
+- [`c0875c9`](https://github.com/Bldg-7/cc-plugin-loader/commit/c0875c9e863f004a1c983d72e6abef70456bb266) Thanks [@ESnark](https://github.com/ESnark)! - Fix agent visibility: use mode "all" instead of "subagent" so agents appear in /agents list
+
 ## 0.2.0
 
 ### Minor Changes
