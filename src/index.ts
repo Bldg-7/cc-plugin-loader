@@ -6,6 +6,7 @@ import { createSystemHook } from "./hooks/system.js";
 import { createCommandHook } from "./hooks/command.js";
 import { createEnvHook } from "./hooks/env.js";
 import { createBridgeHooks } from "./hooks/bridge.js";
+import { createSkillTool } from "./hooks/skill-tool.js";
 import type { ParsedPlugin } from "./types.js";
 
 const plugin: Plugin = async (input) => {
@@ -33,11 +34,14 @@ const plugin: Plugin = async (input) => {
     `[cc-plugin-loader] Loaded ${plugins.length} plugin(s): ${plugins.map((p) => p.name).join(", ")}`,
   );
 
+  const skillTool = createSkillTool(plugins);
+
   return {
     config: createConfigHook(plugins),
     "experimental.chat.system.transform": createSystemHook(plugins),
     "command.execute.before": createCommandHook(plugins),
     "shell.env": createEnvHook(plugins),
+    ...(skillTool && { tool: { skill: skillTool } }),
     ...createBridgeHooks(plugins),
   };
 };
