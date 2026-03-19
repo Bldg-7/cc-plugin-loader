@@ -1,5 +1,5 @@
 {
-  "name": "cc-plugin-loader",
+  "name": "@bldg-7/cc-plugin-loader",
   "version": "0.1.0",
   "type": "module",
   "main": "src/index.ts",
