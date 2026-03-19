@@ -1,5 +1,13 @@
 # @bldg-7/cc-plugin-loader
 
+## 0.2.2
+
+### Patch Changes
+
+- [`4222e9a`](https://github.com/Bldg-7/cc-plugin-loader/commit/4222e9a2c8af2426aae8b6c3df9b92ef8c5db88f) Thanks [@ESnark](https://github.com/ESnark)! - Register custom `skill` tool so LLM can invoke plugin skills
+
+  Skills were visible in the system prompt but calling the Skill tool failed with "not found" because OpenCode has no native skill tool. The plugin now registers a custom `skill` tool via the plugin tool hook, bridging Claude Code's Skill tool to OpenCode.
+
 ## 0.2.1
 
 ### Patch Changes
