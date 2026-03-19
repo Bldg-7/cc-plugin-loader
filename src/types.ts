@@ -47,7 +47,7 @@ export interface SkillFrontmatter {
   name?: string;
   description?: string;
   "allowed-tools"?: string[];
-  tools?: string;
+  tools?: string | string[];
 }
 
 export interface AgentFrontmatter {
@@ -55,8 +55,9 @@ export interface AgentFrontmatter {
   description: string;
   model?: string;
   "allowed-tools"?: string[];
-  tools?: string;
+  tools?: string | string[];
   maxTurns?: number;
+  color?: string;
 }
 
 export interface CommandFrontmatter {
@@ -94,6 +95,7 @@ export interface ParsedAgent {
   model?: string;
   tools: string[];
   maxTurns?: number;
+  color?: string;
   prompt: string;
 }
 

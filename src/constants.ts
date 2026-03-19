@@ -12,7 +12,10 @@ export const TOOL_NAME_MAP: Record<string, string> = {
   WebFetch: "webfetch",
   WebSearch: "websearch",
   Agent: "agent",
-  NotebookEdit: "notebookedit",
+  TodoWrite: "todowrite",
+  Task: "task",
+  LS: "ls",
+  Skill: "skill",
 };
 
 /** OpenCode tool name → Claude Code tool name (reverse of TOOL_NAME_MAP) */

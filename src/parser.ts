@@ -18,17 +18,22 @@ export function parseFrontmatter<T>(content: string): Parsed<T> {
 }
 
 /**
- * Normalize tools from either `allowed-tools` (YAML array) or `tools` (comma-separated string).
+ * Normalize tools from either `allowed-tools` (YAML array) or `tools` (array or comma-separated string).
  */
 export function normalizeTools(fm: {
   "allowed-tools"?: string[];
-  tools?: string;
+  tools?: string | string[];
 }): string[] {
   if (fm["allowed-tools"] && Array.isArray(fm["allowed-tools"])) {
     return fm["allowed-tools"];
   }
-  if (fm.tools && typeof fm.tools === "string") {
-    return fm.tools.split(",").map((t) => t.trim()).filter(Boolean);
+  if (fm.tools) {
+    if (Array.isArray(fm.tools)) {
+      return fm.tools;
+    }
+    if (typeof fm.tools === "string") {
+      return fm.tools.split(",").map((t) => t.trim()).filter(Boolean);
+    }
   }
   return [];
 }

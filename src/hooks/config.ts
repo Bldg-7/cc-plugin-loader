@@ -2,13 +2,39 @@ import type { Config } from "@opencode-ai/sdk";
 import { TOOL_NAME_MAP, MODEL_MAP } from "../constants.js";
 import type { ParsedPlugin } from "../types.js";
 
+/** Claude Code tool names that have no OpenCode equivalent — silently dropped */
+const UNMAPPABLE_TOOLS = new Set([
+  "NotebookEdit",
+  "NotebookRead",
+  "KillShell",
+  "BashOutput",
+  "AskUserQuestion",
+]);
+
+/**
+ * Map Claude Code tool names to OpenCode tool names.
+ * - Exact match in TOOL_NAME_MAP takes priority
+ * - Scoped patterns like "Bash(git:*)" → "bash"
+ * - Tools with no OpenCode equivalent are dropped
+ */
 function mapTools(tools: string[]): Record<string, boolean> {
   const result: Record<string, boolean> = {};
   for (const tool of tools) {
-    const mapped = TOOL_NAME_MAP[tool] || tool.toLowerCase();
+    // Handle scoped patterns like "Bash(git:*)"
+    const baseMatch = tool.match(/^(\w+)\(/);
+    const baseName = baseMatch ? baseMatch[1] : tool;
+
+    if (UNMAPPABLE_TOOLS.has(baseName)) continue;
+
+    const mapped = TOOL_NAME_MAP[baseName] || baseName.toLowerCase();
     result[mapped] = true;
   }
   return result;
+}
+
+function mapModel(model: string): string | undefined {
+  if (model === "inherit") return undefined; // let OpenCode use parent model
+  return MODEL_MAP[model] || model;
 }
 
 export function createConfigHook(plugins: ParsedPlugin[]) {
@@ -21,13 +47,15 @@ export function createConfigHook(plugins: ParsedPlugin[]) {
       // Register agents
       for (const agent of plugin.agents) {
         const key = `${plugin.name}-${agent.name}`;
+        const model = agent.model ? mapModel(agent.model) : undefined;
         config.agent[key] = {
           description: agent.description,
           mode: "subagent",
           prompt: agent.prompt,
           tools: mapTools(agent.tools),
-          ...(agent.model && { model: MODEL_MAP[agent.model] || agent.model }),
+          ...(model && { model }),
           ...(agent.maxTurns && { maxSteps: agent.maxTurns }),
+          ...(agent.color && { color: agent.color }),
         };
       }
 

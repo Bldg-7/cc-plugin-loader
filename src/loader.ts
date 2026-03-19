@@ -150,6 +150,7 @@ async function loadAgents(
         model: frontmatter.model,
         tools: normalizeTools(frontmatter),
         maxTurns: frontmatter.maxTurns,
+        color: frontmatter.color,
         prompt,
       });
     } catch (e) {
